@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice-to-Text AI Summarizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+    
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Voice-to-Text AI Summarizer</h1>
+            <p>Record audio, transcribe with Gemini AI, and generate intelligent summaries</p>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+
+        <div class="main-grid">
+            <!-- Voice Recording Section -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-microphone"></i>
+                    Voice Recording
+                </div>
+                <div class="recording-section">
+                    <div class="recording-controls">
+                        <button class="btn" id="startBtn">
+                            <i class="fas fa-play"></i>
+                            Start
+                        </button>
+                        <button class="btn btn-secondary" id="pauseBtn" disabled>
+                            <i class="fas fa-pause"></i>
+                            Pause
+                        </button>
+                        <button class="btn btn-danger" id="stopBtn" disabled>
+                            <i class="fas fa-stop"></i>
+                            Stop
+                        </button>
+                    </div>
+                    
+                    <div class="timer" id="timer">00:00</div>
+                    <div class="recording-status" id="recordingStatus">Ready to record</div>
+                    
+                    <div class="wave-animation hidden" id="waveAnimation">
+                        <span class="wave-bar"></span>
+                        <span class="wave-bar"></span>
+                        <span class="wave-bar"></span>
+                        <span class="wave-bar"></span>
+                        <span class="wave-bar"></span>
+                    </div>
+
+                    <div class="audio-preview hidden" id="audioPreview">
+                        <h4>Recorded Audio:</h4>
+                        <audio controls id="audioPlayer"></audio>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Upload Section -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-upload"></i>
+                    Upload Audio
+                </div>
+                <div class="file-upload">
+                    <div class="file-drop-zone" id="dropZone">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 15px;"></i>
+                        <p><strong>Click to upload</strong> or drag and drop</p>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">MP3, WAV, M4A, WEBM (max 100MB)</p>
+                    </div>
+                    <input type="file" id="fileInput" class="file-input" accept=".mp3,.wav,.m4a,.webm">
+                    
+                    <div class="audio-preview hidden" id="uploadedAudioPreview">
+                        <h4>Uploaded Audio:</h4>
+                        <audio controls id="uploadedAudioPlayer"></audio>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transcript Section -->
+        <div class="card transcript-section">
+            <div class="card-title">
+                <i class="fas fa-file-text"></i>
+                Transcript
+            </div>
+            <div class="action-buttons">
+                <button class="btn" id="transcribeBtn" disabled>
+                    <i class="fas fa-microphone-alt"></i> Transcribe Audio
+                </button>
+                <button class="btn btn-secondary" id="clearTranscriptBtn">
+                    <i class="fas fa-trash"></i> Clear
+                </button>
+                <button class="btn btn-secondary" id="copyTranscriptBtn">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+                <button class="btn btn-secondary" id="downloadTranscriptBtn">
+                    <i class="fas fa-download"></i> Download
+                </button>
+            </div>
+            
+            <textarea id="transcriptArea" class="transcript-area" placeholder="Your transcribed text will appear here..."></textarea>
+            
+            <div class="action-buttons">
+                <button class="btn btn-success" id="generateSummaryBtn" disabled>
+                    <i class="fas fa-brain"></i> Generate AI Summary
+                </button>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="summary-section" id="summarySection">
+                <h3><i class="fas fa-lightbulb"></i> AI Summary</h3>
+                <div class="summary-content" id="summaryContent">No summary generated yet. Transcribe some audio first, then click "Generate AI Summary".</div>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="copySummaryBtn">
+                        <i class="fas fa-copy"></i> Copy Summary
+                    </button>
+                    <button class="btn btn-secondary" id="downloadSummaryBtn">
+                        <i class="fas fa-download"></i> Download Summary
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Recordings Section -->
+        <div class="card transcript-section">
+            <div class="card-title">
+                <i class="fas fa-headphones"></i> <!-- Changed to headphones for audio -->
+                All Recorded Audios
+            </div>
+            <div class="action-buttons">
+                <button class="btn" id="loadAllRecordingsBtn">
+                    <i class="fas fa-refresh"></i> Load All Audios
+                </button>
+                <button class="btn btn-secondary" id="clearAllRecordingsBtn">
+                    <i class="fas fa-eye-slash"></i> Clear Display
+                </button>
+            </div>
+            <div class="recording-videos" id="allRecordingsContainer">
+                <p style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                    Click "Load All Audios" to view your recorded audios
+                </p>
+            </div>
+        </div>
+
+        <!-- Recording History Section -->
+        <div class="card transcript-section">
+            <div class="card-title">
+                <i class="fas fa-history"></i>
+                Recording History
+            </div>
+            <div class="action-buttons">
+                <button class="btn" id="loadHistoryBtn">
+                    <i class="fas fa-refresh"></i> Load History
+                </button>
+                <button class="btn btn-danger" id="clearHistoryBtn">
+                    <i class="fas fa-bomb"></i> Clear All Data
+                </button>
+            </div>
+            <div class="recording-history" id="recordingHistory">
+                <p style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                    Click "Load History" to view your previous recordings with transcripts and summaries
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Confirmation Modal -->
+    <div id="customConfirmModal" class="custom-modal-backdrop hidden">
+        <div class="custom-modal">
+            <h3 id="customConfirmTitle"></h3>
+            <p id="customConfirmMessage"></p>
+            <div class="custom-modal-actions">
+                <button class="btn btn-secondary" id="customConfirmCancel">Cancel</button>
+                <button class="btn btn-danger" id="customConfirmOK">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+
+    
+</body>
+</html>
